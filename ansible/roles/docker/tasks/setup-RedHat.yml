@@ -1,0 +1,27 @@
+---
+- name: Ensure old versions of Docker are not installed.
+  package:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - docker
+    - docker-common
+    - docker-client
+
+- name: Ensure docker config dir exists
+  file: 
+    path: /etc/docker
+    recurse: yes
+    state: directory
+
+- name: Copy docker config
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: Ensure ip forward is enabled in sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^net'
+    line: 'net.ipv4.ip_forward=1'
+

@@ -1,0 +1,71 @@
+
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+etcd
+
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# CUSTOMIZE THESE OPTIONS
+# default subdomain to use for exposed routes
+openshift_master_default_subdomain={{APP_DNS_SUBDOMAIN}}
+openshift_hosted_registry_storage_host='{{MASTER_IP}}'
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user={{ANSIBLE_SSH_USER}}
+# Default login account: admin / handhand
+openshift_master_htpasswd_users={'admin': '$apr1$gfaL16Jf$c.5LAvg3xNDVQTkk6HpGB1'}
+# END MANDATORY CUSTOMIZATION
+
+ansible_service_broker_install=false
+template_service_broker_install=true
+
+openshift_hosted_registry_replicas=1
+openshift_hosted_router_selector='node-role.kubernetes.io/master=true'
+openshift_hosted_registry_selector='node-role.kubernetes.io/master=true'
+openshift_enable_unsupported_configurations=true
+openshift_hosted_registry_storage_kind='nfs'
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_nfs_directory='/srv/nfs'
+openshift_hosted_registry_storage_volume_name='registry'
+openshift_hosted_registry_storage_volume_size='2Gi' 
+
+
+# If ansible_ssh_user is not root, ansible_become must be set to true
+ansible_become=true
+
+openshift_deployment_type=origin
+openshift_release='{{OPENSHIFT_RELEASE}}'
+
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+
+openshift_disable_check=disk_availability,memory_availability,docker_storage,docker_image_availability
+# one can define at install time custom docker engine options like --registry-mirror=https:...
+openshift_docker_options=" --selinux-enabled --log-driver=journald --storage-driver=overlay"
+
+# OpenShift Router Options
+# Router selector (optional)
+# Router will only be created if nodes matching this label are present.
+# Default value: 'region=infra'
+# openshift_router_selector='node-role.kubernetes.io/infra=true'
+# openshift_registry_selector='node-role.kubernetes.io/infra=true'
+
+[nfs]
+{{MASTER_IP}} openshift_ip={{MASTER_IP}} openshift_host={{MASTER_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/master.key"
+
+# host group for masters
+[masters]
+{{MASTER_IP}} openshift_ip={{MASTER_IP}} openshift_host={{MASTER_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/master.key"
+
+# host group for etcd
+[etcd]
+{{MASTER_IP}} openshift_ip={{MASTER_IP}} openshift_host={{MASTER_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/master.key"
+
+[nodes]
+{{MASTER_IP}} openshift_ip={{MASTER_IP}} openshift_host={{MASTER_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/master.key" openshift_schedulable=true {{NODE_GROUP_MASTER_INFRA}}
+{{NODE01_IP}} openshift_ip={{NODE01_IP}} openshift_host={{NODE01_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/node01.key" openshift_schedulable=true {{NODE_GROUP_COMPUTE}}
+{{NODE02_IP}} openshift_ip={{NODE02_IP}} openshift_host={{NODE02_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/node02.key" openshift_schedulable=true {{NODE_GROUP_COMPUTE}}
+{{NODE03_IP}} openshift_ip={{NODE03_IP}} openshift_host={{NODE03_IP}} ansible_ssh_private_key_file="/home/vagrant/.ssh/node03.key" openshift_schedulable=true {{NODE_GROUP_COMPUTE}}

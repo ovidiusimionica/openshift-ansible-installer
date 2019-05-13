@@ -1,0 +1,12 @@
+---
+#
+# Playbook to install the central stack
+#
+- hosts: nodes
+  sudo: yes
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - { role: docker }
+
+

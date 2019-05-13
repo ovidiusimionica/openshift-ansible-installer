@@ -1,0 +1,22 @@
+---
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: set linux policy permissive
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: adding existing user '{{ ansible_system_user }}' to group docker
+  user:
+    name: '{{ ansible_system_user }}'
+    groups: dockerroot
+    append: yes
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  tags: deploy
+

@@ -1,0 +1,12 @@
+---
+
+# Default Ansible user
+# change this if you use a non-root user for running Ansible playbooks
+ansible_system_user: {{ANSIBLE_SSH_USER}}
+ansible_become: true
+
+
+ansible_os_family: RedHat
+
+# EPEL Repository for extra packages
+epel_repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
