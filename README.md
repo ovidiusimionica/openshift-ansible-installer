@@ -52,7 +52,7 @@ Please adapt the disk size of the docker registry storage.
 
 ### Configure ssh access keys
 
-create a folder under project root directory "keys". For each node of the cluster there must be its ssh key in this folder namede like this:
+create a folder under project root directory "keys". For each node of the cluster there must be its ssh key in this folder named like this:
 ```bash
 master.key
 node01.key
