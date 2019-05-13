@@ -36,6 +36,7 @@ The following table lists the corresponding version relationships between Origin
 
 Example of needed customization of the installer.sh script
 
+```bash
 OPENSHIFT_RELEASE="3.10"
 OPENSHIFT_ANSIBLE_BRANCH="release-${OPENSHIFT_RELEASE}"
 MASTER_IP="192.168.150.101"
@@ -46,6 +47,8 @@ NODE03_IP="192.168.150.104"
 APP_DNS_SUBDOMAIN="apps.example.com"
 
 Please adapt the disk size of the docker registry storage.
+
+```
 
 ### Configure ssh access keys
 
